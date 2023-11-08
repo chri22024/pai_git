@@ -16,8 +16,11 @@ boolean isMemberInputed = false; // member1,2が入力完了したかどうか
 
 
 boolean isInputNumMode = false;
+boolean isSetTimeMode = false;
 
 boolean isClickedEnterBtn = false;
+boolean isClickedTimerBtn = false;
+
 
 
 
@@ -36,7 +39,9 @@ void setup() {
 }
 void draw() {
   background(255);
+  textSize(20);
 
+  //println(isClickedTimerBtn);
 
   if (isMemberInputed) {      // member1,2が入力完了したあと
     text(inputID, width/2, height/2+ 100);
@@ -54,6 +59,12 @@ void draw() {
       one = false;
     }
 
+    for (int i = 0; i < pai.length; i++) {
+
+      print(staff[i].isTimerOn + " ");
+    }
+    println();
+
     setX();
 
     for (int i = 0; i < pai.length; i++) {
@@ -65,11 +76,13 @@ void draw() {
 
     // staffIDの入力モード
     if (isInputNumMode) {
-
-
       // enterボタンを表示させる
       drawEnterBtn();
+      drawTimeStartBtn();
+      drawClearInputIDBtn();
+      
     }
+
 
 
 
@@ -84,6 +97,7 @@ void draw() {
       }
       pai[i].display();
       staff[i].display();
+      staff[i].moveTimer();
     }
 
 
@@ -132,20 +146,14 @@ void drawEnterBtn() {
 
 
 
-void isClickedEnterBtn() {
-  if (!clicked) {
-    if (drawButton_1(width / 2 - 35, height / 2, 70, 40)) {
-
-      isClickedEnterBtn = true;
-    }
-    clicked = true;
-  } else {
-    isClickedEnterBtn = false;
-  }
+// タイマーをスタートさせるボタンを描画
+void drawTimeStartBtn() {
+  fill(255);
+  drawButton(width * 2/3 - 35, height / 2, 70, 40, "Timer Start");
 }
 
 
-
+// クリックされたパイのインデックスを取得
 void getSelectedPaiIndex() {
   for (int i = 0; i < pai.length; i++) {
     if (mouseX > pai[i].x && mouseX < pai[i].x + pai[i].w && mouseY > pai[i].y && mouseY < pai[i].y + pai[i].h) {
@@ -155,6 +163,9 @@ void getSelectedPaiIndex() {
 }
 
 void keyPressed() {
+
+
+
   if (isMemberInputed) {
     if (key >= '0' && key <= '9') {
       inputID = inputID + key; // キーボードから入力された文字を inputChar に格納
@@ -175,6 +186,7 @@ void keyPressed() {
 }
 
 void mousePressed() {
+  if(!isMemberInputed) return;
 
   if (!clicked) {
     isClickedNum = true;
@@ -183,6 +195,14 @@ void mousePressed() {
     // Enterボタンを押したら
     if (isWithinRange(width / 2 - 35, height / 2, 70, 40)) {
       setStaffID();
+    }
+    // Timerボタンを押したら
+    if (isWithinRange(width * 2/3 - 35, height / 2, 70, 40)) {
+      setStaffTimer();
+    }
+    // clearInputIDボタンが押されたら
+    if(isWithinRange(width / 2 + 300, height / 2, 70, 40)){
+      clearInputID();
     }
 
 
@@ -195,6 +215,7 @@ void mouseReleased() {
   isClickedNum = false;
 
   isClickedEnterBtn = false;
+  isClickedTimerBtn = false;
 }
 
 
@@ -207,6 +228,23 @@ boolean isWithinRange(int x, int y, int w, int h) {
   }
 }
 
+void setStaffTimer() {
+  for (int i = 0; i < pai.length; i ++) {
+    if (!staff[clickedIndex].isTimerOn) {
+      staff[clickedIndex].setTimer(int(inputID));
+      inputID = "";
+    }
+  }
+}
+
+void drawClearInputIDBtn() {
+  fill(255);
+  drawButton(width / 2 + 300, height / 2, 70, 40, "clear inputID");
+}
+
+void clearInputID(){
+  inputID = "";
+}
 
 // スタッフidを表示するときのx座標と各パイのx座標を一緒にする
 void setX() {
@@ -221,7 +259,7 @@ void setStaffID() {
   if (clickedIndex != -1) {
     if ( staff[clickedIndex].id == "") {
 
-      println(222);
+      println(22442);
       staff[clickedIndex].id = inputID;
       inputID = "";
     }
